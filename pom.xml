@@ -16,6 +16,7 @@
         <module>01-architecture-evolution</module>
         <module>02-nacos</module>
         <module>03-sentinel-flow</module>
+        <module>04-sentinel-degrade</module>
     </modules>
 
     <properties>

@@ -7,6 +7,7 @@ Spring Cloud Alibaba 系列文章配套代码，每篇文章对应一个独立�
 | 01-architecture-evolution | 系统架构演进与 Spring Cloud Alibaba 简介 |
 | 02-nacos | Nacos 实战及其客户端服务注册源码解析 |
 | 03-sentinel-flow | Sentinel 限流配置实战 |
+| 04-sentinel-degrade | Sentinel 熔断降级策略实战 |
 
 
 ## 环境要求
@@ -130,3 +131,37 @@ curl http://localhost:7072/test-c
 ```
 
 随后在 Sentinel Dashboard 中配置流控规则，使用 JMeter/Postman 压测验证 QPS、并发线程数、关联、链路与 Warm Up 等场景。
+
+## 04 - Sentinel 熔断降级策略实战
+
+代码位于 `04-sentinel-degrade` 模块，服务名 `sentinel-degrade-service`，端口 `7072`。
+
+### 前置条件
+
+1. 启动 Nacos Server（默认 `127.0.0.1:8848`）
+2. 启动 Sentinel Dashboard（参考第 3 章）
+
+### 构建
+
+```bash
+mvn clean package -pl 04-sentinel-degrade -am -DskipTests
+```
+
+### 启动与验证
+
+```bash
+java -jar 04-sentinel-degrade/target/04-sentinel-degrade-1.0.0.jar
+
+# 触发 Sentinel 懒加载
+curl http://localhost:7072/testSlowRate
+curl "http://localhost:7072/testExceptionRate?id=1"
+curl "http://localhost:7072/testException?id=1"
+```
+
+在 Sentinel Dashboard「降级规则」中配置后，使用 JMeter 压测：
+
+| 接口 | 熔断策略 |
+|------|----------|
+| `/testSlowRate` | 慢调用比例 |
+| `/testExceptionRate?id=0` | 异常比例 |
+| `/testException?id=0` | 异常数 |
