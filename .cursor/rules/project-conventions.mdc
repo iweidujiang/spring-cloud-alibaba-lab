@@ -1,0 +1,58 @@
+---
+description: Spring Cloud Alibaba Lab 项目开发规范
+alwaysApply: true
+---
+
+# Spring Cloud Alibaba Lab 开发规范
+
+## 代码注释
+
+- 所有 Java 类、接口、枚举必须编写 JavaDoc 注释。
+- 所有 public / protected 方法必须编写 JavaDoc 注释，说明用途、参数与返回值。
+- 类注释必须包含 `@author 苏渡苇`。
+
+示例：
+
+```java
+/**
+ * 用户业务服务。
+ *
+ * @author 苏渡苇
+ */
+@Service
+public class UserService {
+
+    /**
+     * 根据用户 ID 查询用户名。
+     *
+     * @param userId 用户 ID
+     * @return 用户名，不存在时返回默认值
+     */
+    public String getUserName(Long userId) {
+        // ...
+    }
+}
+```
+
+## 文档结构
+
+- 仅在仓库根目录维护 `README.md`，各章节模块下不要创建 README。
+- 章节说明、运行方式、验证命令统一写在根目录 README 的对应章节中。
+
+## 模块组织
+
+- 每篇文章对应一个独立 Maven 模块，目录命名：`01-xxx`、`02-xxx`，依此类推。
+- GAV：`io.github.iweidujiang`，版本 `1.0.0`。
+
+## Git 提交
+
+- 每次完成代码改动后，必须给出可直接使用的 commit message。
+- commit message 使用中文，简明描述「为什么改」，1～2 句即可。
+
+示例：
+
+```
+docs: 添加项目开发规范并统一 JavaDoc 注释
+
+补充 @author 苏渡苇，约定仅根目录维护 README。
+```
