@@ -1,0 +1,22 @@
+server:
+  port: 7072
+
+spring:
+  application:
+    name: sentinel-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+    sentinel:
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD:localhost:8080}
+        port: 8719
+      # 链路限流必须关闭 web-context-unify，详见 https://github.com/alibaba/Sentinel/issues/1213
+      web-context-unify: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

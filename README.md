@@ -6,6 +6,7 @@ Spring Cloud Alibaba 系列文章配套代码，每篇文章对应一个独立�
 |------|------|
 | 01-architecture-evolution | 系统架构演进与 Spring Cloud Alibaba 简介 |
 | 02-nacos | Nacos 实战及其客户端服务注册源码解析 |
+| 03-sentinel-flow | Sentinel 限流配置实战 |
 
 
 ## 环境要求
@@ -90,3 +91,42 @@ curl http://localhost:7071/info
 ```
 
 可通过环境变量 `NACOS_SERVER` 指定 Nacos 地址，例如：`NACOS_SERVER=192.168.1.100:8848`。
+
+## 03 - Sentinel 限流配置实战
+
+代码位于 `03-sentinel-flow` 模块，服务名 `sentinel-service`，端口 `7072`。
+
+### 前置条件
+
+1. 启动 Nacos Server（默认 `127.0.0.1:8848`）
+2. 下载并启动 Sentinel Dashboard（示例 1.8.3）：
+
+```bash
+java -Dserver.port=8080 \
+  -Dcsp.sentinel.dashboard.server=localhost:8080 \
+  -Dproject.name=sentinel-dashboard \
+  -Dsentinel.dashboard.auth.username=sentinel \
+  -Dsentinel.dashboard.auth.password=123456 \
+  -jar sentinel-dashboard-1.8.3.jar
+```
+
+> 若 8080 端口已被占用（如第 1 章示例），可将 Dashboard 端口改为 8858，并设置环境变量 `SENTINEL_DASHBOARD=localhost:8858`。
+
+### 构建
+
+```bash
+mvn clean package -pl 03-sentinel-flow -am -DskipTests
+```
+
+### 启动与验证
+
+```bash
+java -jar 03-sentinel-flow/target/03-sentinel-flow-1.0.0.jar
+
+# 先访问接口触发 Sentinel 懒加载
+curl http://localhost:7072/test-a
+curl http://localhost:7072/test-b
+curl http://localhost:7072/test-c
+```
+
+随后在 Sentinel Dashboard 中配置流控规则，使用 JMeter/Postman 压测验证 QPS、并发线程数、关联、链路与 Warm Up 等场景。
