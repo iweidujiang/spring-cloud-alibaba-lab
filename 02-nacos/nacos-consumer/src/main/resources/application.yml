@@ -1,0 +1,13 @@
+server:
+  port: 9080
+
+spring:
+  application:
+    name: nacos-consumer
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+
+service-url:
+  nacos-provider-service: http://nacos-provider
