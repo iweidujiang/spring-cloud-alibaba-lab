@@ -8,6 +8,7 @@ Spring Cloud Alibaba 系列文章配套代码，每篇文章对应一个独立�
 | 02-nacos | Nacos 实战及其客户端服务注册源码解析 |
 | 03-sentinel-flow | Sentinel 限流配置实战 |
 | 04-sentinel-degrade | Sentinel 熔断降级策略实战 |
+| 05-sentinel-nacos-datasource | Sentinel 规则持久化到 Nacos |
 
 
 ## 环境要求
@@ -165,3 +166,31 @@ curl "http://localhost:7072/testException?id=1"
 | `/testSlowRate` | 慢调用比例 |
 | `/testExceptionRate?id=0` | 异常比例 |
 | `/testException?id=0` | 异常数 |
+
+## 05 - Sentinel 规则持久化到 Nacos
+
+代码位于 `05-sentinel-nacos-datasource` 模块，服务名 `sentinel-nacos-service`，端口 `7072`。
+
+### 前置条件
+
+1. 启动 Nacos Server（默认 `127.0.0.1:8848`）
+2. 启动 Sentinel Dashboard（参考第 3 章）
+3. 在 Nacos 配置管理 `DEFAULT_GROUP` 下创建 `sentinelFlowRule.json`（JSON 格式），内容见 `05-sentinel-nacos-datasource/config/sentinelFlowRule.json`
+
+### 构建
+
+```bash
+mvn clean package -pl 05-sentinel-nacos-datasource -am -DskipTests
+```
+
+### 启动与验证
+
+```bash
+java -jar 05-sentinel-nacos-datasource/target/05-sentinel-nacos-datasource-1.0.0.jar
+
+# 触发资源注册
+curl http://localhost:7072/getUser
+curl http://localhost:7072/getOrder
+```
+
+快速多次刷新 `/getUser` 或 `/getOrder`，QPS 超过 2 时应被限流。重启应用后规则仍从 Nacos 加载，不会丢失。

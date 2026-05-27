@@ -1,0 +1,20 @@
+[
+  {
+    "resource": "getUser",
+    "limitApp": "default",
+    "grade": 1,
+    "count": 2,
+    "strategy": 0,
+    "controlBehavior": 0,
+    "clusterMode": false
+  },
+  {
+    "resource": "getOrder",
+    "limitApp": "default",
+    "grade": 1,
+    "count": 2,
+    "strategy": 0,
+    "controlBehavior": 0,
+    "clusterMode": false
+  }
+]
