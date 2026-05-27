@@ -9,6 +9,7 @@ Spring Cloud Alibaba 系列文章配套代码，每篇文章对应一个独立�
 | 03-sentinel-flow | Sentinel 限流配置实战 |
 | 04-sentinel-degrade | Sentinel 熔断降级策略实战 |
 | 05-sentinel-nacos-datasource | Sentinel 规则持久化到 Nacos |
+| 06-sentinel-block-fallback | Sentinel blockHandler 与 fallback 优雅返回 |
 
 
 ## 环境要求
@@ -194,3 +195,36 @@ curl http://localhost:7072/getOrder
 ```
 
 快速多次刷新 `/getUser` 或 `/getOrder`，QPS 超过 2 时应被限流。重启应用后规则仍从 Nacos 加载，不会丢失。
+
+## 06 - Sentinel blockHandler 与 fallback 优雅返回
+
+代码位于 `06-sentinel-block-fallback` 目录，包含 `lab-common`（公共模块）和 `sentinel-hotkey-service`（示例服务）。
+
+### 前置条件
+
+1. 启动 Nacos Server（默认 `127.0.0.1:8848`）
+2. 启动 Sentinel Dashboard（参考第 3 章）
+3. 在 Nacos `DEFAULT_GROUP` 下创建 `hotKeyRule.json`，内容见 `06-sentinel-block-fallback/config/hotKeyRule.json`
+
+### 构建
+
+```bash
+mvn clean package -pl 06-sentinel-block-fallback/sentinel-hotkey-service -am -DskipTests
+```
+
+### 启动与验证
+
+```bash
+java -jar 06-sentinel-block-fallback/sentinel-hotkey-service/target/sentinel-hotkey-service-1.0.0.jar
+
+# 正常访问（无热点参数，不限流）
+curl "http://localhost:7072/getProduct?categoryId=1"
+
+# 带热点参数 userId，快速刷新验证限流
+curl "http://localhost:7072/getProduct?userId=1001"
+
+# 验证 fallback（userId 为负数触发业务异常）
+curl "http://localhost:7072/getProduct?userId=-1"
+```
+
+限流后返回统一 JSON：`{"code":"B0002","message":"热点参数限流","data":null}`。

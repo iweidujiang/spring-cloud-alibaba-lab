@@ -1,0 +1,34 @@
+server:
+  port: 7072
+
+spring:
+  application:
+    name: sentinel-hotkey-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+    sentinel:
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD:localhost:8080}
+        port: 8722
+      web-context-unify: false
+      datasource:
+        flow:
+          nacos:
+            server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+            dataId: sentinelFlowRule.json
+            groupId: DEFAULT_GROUP
+            rule-type: flow
+        param-flow:
+          nacos:
+            server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+            dataId: hotKeyRule.json
+            groupId: DEFAULT_GROUP
+            rule-type: param-flow
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

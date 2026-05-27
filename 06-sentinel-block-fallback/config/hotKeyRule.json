@@ -1,0 +1,11 @@
+[
+  {
+    "resource": "getProduct",
+    "count": 1,
+    "grade": 1,
+    "paramIdx": 0,
+    "durationInSec": 1,
+    "controlBehavior": 0,
+    "clusterMode": false
+  }
+]
