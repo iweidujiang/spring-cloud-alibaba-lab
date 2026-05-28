@@ -1,0 +1,35 @@
+server:
+  port: 6061
+
+spring:
+  application:
+    name: open-feign-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+    sentinel:
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD:localhost:8080}
+        port: 8723
+      web-context-unify: false
+      datasource:
+        flow:
+          nacos:
+            server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+            groupId: DEFAULT_GROUP
+            dataId: sentinelFlowRule.json
+            rule-type: flow
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+      nacos-provider:
+        connectTimeout: 1000
+        readTimeout: 1000
+        loggerLevel: full
+  sentinel:
+    enabled: true

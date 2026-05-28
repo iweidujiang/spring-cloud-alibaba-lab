@@ -20,6 +20,7 @@
         <module>05-sentinel-nacos-datasource</module>
         <module>06-sentinel-block-fallback</module>
         <module>07-open-feign</module>
+        <module>08-feign-sentinel</module>
     </modules>
 
     <properties>

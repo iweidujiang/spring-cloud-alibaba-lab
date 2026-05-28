@@ -11,6 +11,7 @@ Spring Cloud Alibaba 系列文章配套代码，每篇文章对应一个独立�
 | 05-sentinel-nacos-datasource | Sentinel 规则持久化到 Nacos |
 | 06-sentinel-block-fallback | Sentinel blockHandler 与 fallback 优雅返回 |
 | 07-open-feign | OpenFeign 远程接口调用 |
+| 08-feign-sentinel | OpenFeign 整合 Sentinel |
 
 
 ## 环境要求
@@ -261,4 +262,36 @@ curl http://localhost:6061/product/3
 
 # 5. 验证超时（readTimeout=1000ms，delay=3 应超时）
 curl "http://localhost:6061/product/1?delay=3"
+```
+
+## 08 - OpenFeign 整合 Sentinel
+
+代码位于 `08-feign-sentinel` 目录，包含 `feign-sentinel-common`、`feign-sentinel-provider`、`feign-sentinel-service`。
+
+### 前置条件
+
+1. 启动 Nacos Server（默认 `127.0.0.1:8848`）
+2. 启动 Sentinel Dashboard（参考第 3 章）
+3. 在 Nacos `DEFAULT_GROUP` 下创建 `sentinelFlowRule.json`，内容见 `08-feign-sentinel/config/sentinelFlowRule.json`
+
+### 构建
+
+```bash
+mvn clean package -pl 08-feign-sentinel/feign-sentinel-service -am -DskipTests
+```
+
+### 启动与验证
+
+```bash
+# 1. 启动消费者（6061）
+java -jar 08-feign-sentinel/feign-sentinel-service/target/feign-sentinel-service-1.0.0.jar
+
+# 2. 验证 Feign fallback（不启动 provider）
+curl http://localhost:6061/product/1
+# {"code":"C0001","message":"远程调用失败","data":null}
+
+# 3. 启动提供者后再验证正常调用与 Sentinel 限流
+java -jar 08-feign-sentinel/feign-sentinel-provider/target/feign-sentinel-provider-1.0.0.jar
+curl http://localhost:6061/product/3
+# 快速刷新触发限流：{"code":"C0002","message":"访问资源 getProduct 被限流","data":null}
 ```
