@@ -1,0 +1,25 @@
+server:
+  port: 6061
+
+spring:
+  application:
+    name: open-feign-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+      nacos-provider:
+        connectTimeout: 1000
+        readTimeout: 1000
+        loggerLevel: full
+
+logging:
+  level:
+    io.github.iweidujiang.lab07.consumer.client.ProductService: debug

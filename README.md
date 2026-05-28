@@ -10,6 +10,7 @@ Spring Cloud Alibaba 系列文章配套代码，每篇文章对应一个独立�
 | 04-sentinel-degrade | Sentinel 熔断降级策略实战 |
 | 05-sentinel-nacos-datasource | Sentinel 规则持久化到 Nacos |
 | 06-sentinel-block-fallback | Sentinel blockHandler 与 fallback 优雅返回 |
+| 07-open-feign | OpenFeign 远程接口调用 |
 
 
 ## 环境要求
@@ -228,3 +229,36 @@ curl "http://localhost:7072/getProduct?userId=-1"
 ```
 
 限流后返回统一 JSON：`{"code":"B0002","message":"热点参数限流","data":null}`。
+
+## 07 - OpenFeign 远程接口调用
+
+代码位于 `07-open-feign` 目录，包含 `feign-provider`（服务提供者）和 `open-feign-service`（Feign 消费者）。
+
+### 前置条件
+
+启动 Nacos Server（默认 `127.0.0.1:8848`）。
+
+### 构建
+
+```bash
+mvn clean package -pl 07-open-feign/feign-provider,07-open-feign/open-feign-service -am -DskipTests
+```
+
+### 启动与验证
+
+```bash
+# 1. 启动提供者（8080，注册为 nacos-provider）
+java -jar 07-open-feign/feign-provider/target/feign-provider-1.0.0.jar
+
+# 2. 可选：再启动一个实例验证负载均衡（8081）
+java -jar 07-open-feign/feign-provider/target/feign-provider-1.0.0.jar --server.port=8081
+
+# 3. 启动 Feign 消费者（6061）
+java -jar 07-open-feign/open-feign-service/target/open-feign-service-1.0.0.jar
+
+# 4. 通过 Feign 远程调用
+curl http://localhost:6061/product/3
+
+# 5. 验证超时（readTimeout=1000ms，delay=3 应超时）
+curl "http://localhost:6061/product/1?delay=3"
+```
