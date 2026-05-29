@@ -22,6 +22,7 @@
         <module>07-open-feign</module>
         <module>08-feign-sentinel</module>
         <module>09-gateway</module>
+        <module>10-gateway-rate-limit</module>
     </modules>
 
     <properties>

@@ -13,6 +13,7 @@ Spring Cloud Alibaba 系列文章配套代码，每篇文章对应一个独立�
 | 07-open-feign | OpenFeign 远程接口调用 |
 | 08-feign-sentinel | OpenFeign 整合 Sentinel |
 | 09-gateway | Spring Cloud Gateway 网关 |
+| 10-gateway-rate-limit | Spring Cloud Gateway 网关限流 |
 
 
 ## 环境要求
@@ -334,4 +335,48 @@ curl http://localhost:8000/order/info/1
 
 # 7. 多次请求验证 user-service 负载均衡（观察 serverPort 在 8001/8002 间切换）
 curl http://localhost:8000/user/info/1
+```
+
+## 10 - Spring Cloud Gateway 网关限流
+
+代码位于 `10-gateway-rate-limit` 目录，包含 `gateway-rate-limit-user-service`、`gateway-rate-limit-order-service`、`gateway-rate-limit-service`。
+
+演示两种限流方式：
+
+1. **RequestRateLimiter + Redis**：对 `order-service` 路由按 `userId` 参数限流
+2. **Sentinel 网关流控**：对 `user-service` 路由限流，规则持久化到 Nacos（`gw-flow`）
+
+### 前置条件
+
+1. 启动 Nacos Server（默认 `127.0.0.1:8848`）
+2. 启动 Redis（默认 `127.0.0.1:6379`）
+3. 启动 Sentinel Dashboard（参考第 3 章，默认 `localhost:8080`）
+4. 在 Nacos `DEFAULT_GROUP` 下创建 `myGatewayRule.json`，内容见 `10-gateway-rate-limit/config/myGatewayRule.json`
+
+### 构建
+
+```bash
+mvn clean package -pl 10-gateway-rate-limit/gateway-rate-limit-service,10-gateway-rate-limit/gateway-rate-limit-user-service,10-gateway-rate-limit/gateway-rate-limit-order-service -am -DskipTests
+```
+
+### 启动与验证
+
+```bash
+# 1. 启动用户服务（8001）
+java -jar 10-gateway-rate-limit/gateway-rate-limit-user-service/target/gateway-rate-limit-user-service-1.0.0.jar
+
+# 2. 启动订单服务（8003）
+java -jar 10-gateway-rate-limit/gateway-rate-limit-order-service/target/gateway-rate-limit-order-service-1.0.0.jar
+
+# 3. 启动网关（8000）
+java -jar 10-gateway-rate-limit/gateway-rate-limit-service/target/gateway-rate-limit-service-1.0.0.jar
+
+# 4. Redis 限流：order 路由必须带 userId 参数
+curl "http://localhost:8000/order/info/2?userId=198276"
+
+# 5. 快速刷新触发 Redis 令牌桶限流（HTTP 429 Too Many Requests）
+
+# 6. Sentinel 限流：user 路由快速刷新
+curl http://localhost:8000/user/info/1
+# 触发限流后返回：{"code": 429, "message": "哥们，这瓜不熟，你走吧..."}
 ```
