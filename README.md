@@ -12,6 +12,7 @@ Spring Cloud Alibaba 系列文章配套代码，每篇文章对应一个独立�
 | 06-sentinel-block-fallback | Sentinel blockHandler 与 fallback 优雅返回 |
 | 07-open-feign | OpenFeign 远程接口调用 |
 | 08-feign-sentinel | OpenFeign 整合 Sentinel |
+| 09-gateway | Spring Cloud Gateway 网关 |
 
 
 ## 环境要求
@@ -294,4 +295,43 @@ curl http://localhost:6061/product/1
 java -jar 08-feign-sentinel/feign-sentinel-provider/target/feign-sentinel-provider-1.0.0.jar
 curl http://localhost:6061/product/3
 # 快速刷新触发限流：{"code":"C0002","message":"访问资源 getProduct 被限流","data":null}
+```
+
+## 09 - Spring Cloud Gateway 网关
+
+代码位于 `09-gateway` 目录，包含 `gateway-user-service`、`gateway-order-service`、`gateway-service`。
+
+### 前置条件
+
+1. 启动 Nacos Server（默认 `127.0.0.1:8848`）
+
+### 构建
+
+```bash
+mvn clean package -pl 09-gateway -am -DskipTests
+```
+
+### 启动与验证
+
+```bash
+# 1. 启动用户服务（8001）
+java -jar 09-gateway/gateway-user-service/target/gateway-user-service-1.0.0.jar
+
+# 2. 可选：再启动一个 user-service 实例验证负载均衡（8002）
+java -jar 09-gateway/gateway-user-service/target/gateway-user-service-1.0.0.jar --server.port=8002
+
+# 3. 启动订单服务（8003）
+java -jar 09-gateway/gateway-order-service/target/gateway-order-service-1.0.0.jar
+
+# 4. 启动网关（8000）
+java -jar 09-gateway/gateway-service/target/gateway-service-1.0.0.jar
+
+# 5. 通过网关访问用户服务（含 X-Request-Home 请求头）
+curl http://localhost:8000/user/info/1
+
+# 6. 通过网关访问订单服务
+curl http://localhost:8000/order/info/1
+
+# 7. 多次请求验证 user-service 负载均衡（观察 serverPort 在 8001/8002 间切换）
+curl http://localhost:8000/user/info/1
 ```
