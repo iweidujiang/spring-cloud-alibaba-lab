@@ -1,0 +1,50 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: gateway-service
+  redis:
+    host: ${REDIS_HOST:127.0.0.1}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/user/**
+          filters:
+            - AddRequestHeader=X-Request-Home, China
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/order/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@userKeyResolver}"
+    sentinel:
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD:localhost:8080}
+      datasource:
+        myGatewayRule:
+          nacos:
+            server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+            dataId: myGatewayRule.json
+            groupId: DEFAULT_GROUP
+            rule-type: gw-flow
+      scg:
+        fallback:
+          mode: response
+          response-status: 200
+          response-body: '{"code": 429, "message": "哥们，这瓜不熟，你走吧..."}'
