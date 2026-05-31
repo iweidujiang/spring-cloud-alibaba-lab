@@ -26,6 +26,7 @@
         <module>11-sleuth-zipkin</module>
         <module>12-spring-boot-admin</module>
         <module>13-seata-intro</module>
+        <module>14-seata-deploy</module>
     </modules>
 
     <properties>

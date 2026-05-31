@@ -17,6 +17,7 @@ Spring Cloud Alibaba 系列文章配套代码，每篇文章对应一个独立�
 | 11-sleuth-zipkin | Spring Cloud Sleuth 整合 Zipkin |
 | 12-spring-boot-admin | Spring Boot Admin 监控 |
 | 13-seata-intro | 分布式事务与 Seata 简介 |
+| 14-seata-deploy | Seata Server 部署（docker-compose / K8S） |
 
 
 ## 环境要求
@@ -487,4 +488,52 @@ curl "http://localhost:8040/order/create?productId=1&quantity=1"
 curl "http://localhost:8040/order/create?productId=1&quantity=1&simulateFail=true"
 curl http://localhost:8040/order/list
 curl "http://localhost:8041/warehouse/stock?productId=1"
+```
+
+## 14 - Seata Server 部署（番外）
+
+本章为部署文档，配置位于 `14-seata-deploy` 目录：
+
+| 路径 | 说明 |
+|------|------|
+| `config/seata-server.sql` | Seata DB 模式表结构 |
+| `config/seataServer.properties` | Nacos 配置模板（group: `SEATA_GROUP`） |
+| `config/registry.conf` | Seata 注册/配置中心连接模板 |
+| `docker-compose/docker-compose-single.yml` | 单节点 Seata Server |
+| `docker-compose/docker-compose-cluster.yml` | 三节点 Seata Server 集群 |
+| `k8s/seata-ha-server.yaml` | Kubernetes 高可用部署 |
+
+### 前置条件
+
+1. Docker / Docker Compose（单节点或集群部署）
+2. MySQL 8（执行 `seata-server.sql`）
+3. Nacos（导入 `seataServer.properties`，按需修改 `registry.conf` 中的地址与账号）
+4. Kubernetes + Rancher（可选，K8S 部署）
+
+### 部署步骤（单节点）
+
+```bash
+# 1. 创建数据库并导入表结构
+mysql -u root -p -e "CREATE DATABASE \`seata-server\` DEFAULT CHARACTER SET utf8mb4;"
+mysql -u root -p seata-server < 14-seata-deploy/config/seata-server.sql
+
+# 2. 在 Nacos 创建 SEATA_GROUP 配置 seataServer.properties（见 config/seataServer.properties）
+
+# 3. 按环境修改 14-seata-deploy/config/registry.conf
+
+# 4. 启动 Seata Server（8091）
+cd 14-seata-deploy/docker-compose
+docker compose -f docker-compose-single.yml up -d
+
+# 5. 在 Nacos 服务列表确认 seata-server 已注册
+```
+
+### 集群部署
+
+```bash
+# Docker Compose 三节点（8091/8092/8093）
+docker compose -f docker-compose-cluster.yml up -d
+
+# Kubernetes（需先修改 k8s/seata-ha-server.yaml 中 Nacos 地址）
+kubectl apply -f ../k8s/seata-ha-server.yaml
 ```
