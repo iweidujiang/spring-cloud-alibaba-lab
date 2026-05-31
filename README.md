@@ -14,6 +14,7 @@ Spring Cloud Alibaba 系列文章配套代码，每篇文章对应一个独立�
 | 08-feign-sentinel | OpenFeign 整合 Sentinel |
 | 09-gateway | Spring Cloud Gateway 网关 |
 | 10-gateway-rate-limit | Spring Cloud Gateway 网关限流 |
+| 11-sleuth-zipkin | Spring Cloud Sleuth 整合 Zipkin |
 
 
 ## 环境要求
@@ -379,4 +380,44 @@ curl "http://localhost:8000/order/info/2?userId=198276"
 # 6. Sentinel 限流：user 路由快速刷新
 curl http://localhost:8000/user/info/1
 # 触发限流后返回：{"code": 429, "message": "哥们，这瓜不熟，你走吧..."}
+```
+
+## 11 - Spring Cloud Sleuth 整合 Zipkin
+
+代码位于 `11-sleuth-zipkin` 目录，包含 `sleuth-zipkin-common`、`sleuth-zipkin-gateway-service`、`sleuth-zipkin-order-service`、`sleuth-zipkin-user-service`、`sleuth-zipkin-product-service`、`sleuth-zipkin-loyalty-service`。
+
+调用链路：`gateway-service` → `order-service` → `user-service` / `product-service` → `loyalty-service`
+
+### 前置条件
+
+1. 启动 Nacos Server（默认 `127.0.0.1:8848`）
+2. 启动 Zipkin（默认 `127.0.0.1:9411`，可用 `11-sleuth-zipkin/config/docker-compose.yml`）
+
+```bash
+docker compose -f 11-sleuth-zipkin/config/docker-compose.yml up -d
+```
+
+### 构建
+
+```bash
+mvn clean package -pl 11-sleuth-zipkin/sleuth-zipkin-gateway-service,11-sleuth-zipkin/sleuth-zipkin-order-service,11-sleuth-zipkin/sleuth-zipkin-user-service,11-sleuth-zipkin/sleuth-zipkin-product-service,11-sleuth-zipkin/sleuth-zipkin-loyalty-service -am -DskipTests
+```
+
+### 启动与验证
+
+```bash
+# 1. 启动后端服务
+java -jar 11-sleuth-zipkin/sleuth-zipkin-loyalty-service/target/sleuth-zipkin-loyalty-service-1.0.0.jar
+java -jar 11-sleuth-zipkin/sleuth-zipkin-product-service/target/sleuth-zipkin-product-service-1.0.0.jar
+java -jar 11-sleuth-zipkin/sleuth-zipkin-user-service/target/sleuth-zipkin-user-service-1.0.0.jar
+java -jar 11-sleuth-zipkin/sleuth-zipkin-order-service/target/sleuth-zipkin-order-service-1.0.0.jar
+
+# 2. 启动网关（8000）
+java -jar 11-sleuth-zipkin/sleuth-zipkin-gateway-service/target/sleuth-zipkin-gateway-service-1.0.0.jar
+
+# 3. 通过网关下单
+curl "http://localhost:8000/order/create?userId=1&productId=1"
+
+# 4. 查看各服务日志中的 traceId/spanId，并在 Zipkin UI 查看链路
+# http://127.0.0.1:9411/zipkin/
 ```

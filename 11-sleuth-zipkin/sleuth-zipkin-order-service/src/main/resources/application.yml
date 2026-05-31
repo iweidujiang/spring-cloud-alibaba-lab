@@ -1,0 +1,19 @@
+server:
+  port: 8030
+
+spring:
+  application:
+    name: order-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    base-url: ${ZIPKIN_URL:http://127.0.0.1:9411}
+
+logging:
+  level:
+    org.springframework.web.servlet.DispatcherServlet: DEBUG

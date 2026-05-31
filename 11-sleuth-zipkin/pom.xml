@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.iweidujiang</groupId>
+        <artifactId>spring-cloud-alibaba-lab</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>11-sleuth-zipkin</artifactId>
+    <packaging>pom</packaging>
+    <name>11 - Spring Cloud Sleuth and Zipkin</name>
+    <description>Spring Cloud Sleuth 整合 Zipkin 分布式链路追踪示例</description>
+
+    <modules>
+        <module>sleuth-zipkin-common</module>
+        <module>sleuth-zipkin-loyalty-service</module>
+        <module>sleuth-zipkin-product-service</module>
+        <module>sleuth-zipkin-user-service</module>
+        <module>sleuth-zipkin-order-service</module>
+        <module>sleuth-zipkin-gateway-service</module>
+    </modules>
+</project>
