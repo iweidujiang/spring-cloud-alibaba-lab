@@ -16,6 +16,7 @@ Spring Cloud Alibaba 系列文章配套代码，每篇文章对应一个独立�
 | 10-gateway-rate-limit | Spring Cloud Gateway 网关限流 |
 | 11-sleuth-zipkin | Spring Cloud Sleuth 整合 Zipkin |
 | 12-spring-boot-admin | Spring Boot Admin 监控 |
+| 13-seata-intro | 分布式事务与 Seata 简介 |
 
 
 ## 环境要求
@@ -452,4 +453,38 @@ java -jar 12-spring-boot-admin/boot-admin-demo-service/target/boot-admin-demo-se
 # 4. 查看示例服务 Actuator
 curl http://localhost:8083/actuator/health
 curl http://localhost:8083/demo/info
+```
+
+## 13 - 分布式事务与 Seata 简介
+
+本章为理论介绍，配套代码演示**未使用 Seata 时**跨服务调用可能出现的数据不一致问题。可运行 Seata 解决方案见第 15 章。
+
+代码位于 `13-seata-intro` 目录，包含 `seata-intro-order-service`、`seata-intro-warehouse-service`。
+
+### 前置条件
+
+1. 启动 Nacos Server（默认 `127.0.0.1:8848`）
+
+### 构建
+
+```bash
+mvn clean package -pl 13-seata-intro/seata-intro-order-service,13-seata-intro/seata-intro-warehouse-service -am -DskipTests
+```
+
+### 启动与验证
+
+```bash
+# 1. 启动库存服务（8041）
+java -jar 13-seata-intro/seata-intro-warehouse-service/target/seata-intro-warehouse-service-1.0.0.jar
+
+# 2. 启动订单服务（8040）
+java -jar 13-seata-intro/seata-intro-order-service/target/seata-intro-order-service-1.0.0.jar
+
+# 3. 正常下单
+curl "http://localhost:8040/order/create?productId=1&quantity=1"
+
+# 4. 模拟库存扣减失败（本地订单已创建，库存未扣减，数据不一致）
+curl "http://localhost:8040/order/create?productId=1&quantity=1&simulateFail=true"
+curl http://localhost:8040/order/list
+curl "http://localhost:8041/warehouse/stock?productId=1"
 ```

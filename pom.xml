@@ -25,6 +25,7 @@
         <module>10-gateway-rate-limit</module>
         <module>11-sleuth-zipkin</module>
         <module>12-spring-boot-admin</module>
+        <module>13-seata-intro</module>
     </modules>
 
     <properties>

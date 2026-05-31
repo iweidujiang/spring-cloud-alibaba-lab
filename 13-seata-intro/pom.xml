@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.iweidujiang</groupId>
+        <artifactId>spring-cloud-alibaba-lab</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>13-seata-intro</artifactId>
+    <packaging>pom</packaging>
+    <name>13 - Seata Introduction</name>
+    <description>分布式事务与 Seata 简介（问题演示，不含 Seata 协调）</description>
+
+    <modules>
+        <module>seata-intro-warehouse-service</module>
+        <module>seata-intro-order-service</module>
+    </modules>
+</project>
