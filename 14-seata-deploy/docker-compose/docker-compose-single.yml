@@ -1,0 +1,13 @@
+version: "3"
+services:
+  seata-server:
+    image: seataio/seata-server:1.4.2
+    container_name: seata-server
+    ports:
+      - "8091:8091"
+    environment:
+      SEATA_PORT: 8091
+      SEATA_IP: ${SEATA_IP:-127.0.0.1}
+    volumes:
+      - ../config/registry.conf:/seata-server/resources/registry.conf
+    restart: unless-stopped
