@@ -24,6 +24,7 @@
         <module>09-gateway</module>
         <module>10-gateway-rate-limit</module>
         <module>11-sleuth-zipkin</module>
+        <module>12-spring-boot-admin</module>
     </modules>
 
     <properties>

@@ -15,6 +15,7 @@ Spring Cloud Alibaba 系列文章配套代码，每篇文章对应一个独立�
 | 09-gateway | Spring Cloud Gateway 网关 |
 | 10-gateway-rate-limit | Spring Cloud Gateway 网关限流 |
 | 11-sleuth-zipkin | Spring Cloud Sleuth 整合 Zipkin |
+| 12-spring-boot-admin | Spring Boot Admin 监控 |
 
 
 ## 环境要求
@@ -420,4 +421,35 @@ curl "http://localhost:8000/order/create?userId=1&productId=1"
 
 # 4. 查看各服务日志中的 traceId/spanId，并在 Zipkin UI 查看链路
 # http://127.0.0.1:9411/zipkin/
+```
+
+## 12 - Spring Boot Admin 监控
+
+代码位于 `12-spring-boot-admin` 目录，包含 `boot-admin-server`、`boot-admin-demo-service`。
+
+### 前置条件
+
+1. 启动 Nacos Server（默认 `127.0.0.1:8848`）
+
+### 构建
+
+```bash
+mvn clean package -pl 12-spring-boot-admin/boot-admin-server,12-spring-boot-admin/boot-admin-demo-service -am -DskipTests
+```
+
+### 启动与验证
+
+```bash
+# 1. 启动 Admin Server（8082，默认账号 admin / admin123）
+java -jar 12-spring-boot-admin/boot-admin-server/target/boot-admin-server-1.0.0.jar
+
+# 2. 启动示例微服务（8083）
+java -jar 12-spring-boot-admin/boot-admin-demo-service/target/boot-admin-demo-service-1.0.0.jar
+
+# 3. 访问 Admin 控制台
+# http://localhost:8082/  （登录 admin / admin123）
+
+# 4. 查看示例服务 Actuator
+curl http://localhost:8083/actuator/health
+curl http://localhost:8083/demo/info
 ```

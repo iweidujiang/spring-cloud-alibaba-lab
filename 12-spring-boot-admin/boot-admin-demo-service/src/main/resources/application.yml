@@ -1,0 +1,26 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: boot-admin-demo-service
+  boot:
+    admin:
+      client:
+        url: http://localhost:8082
+        prefer-ip: true
+        username: admin
+        password: admin123
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
