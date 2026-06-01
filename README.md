@@ -18,6 +18,7 @@ Spring Cloud Alibaba 系列文章配套代码，每篇文章对应一个独立�
 | 12-spring-boot-admin | Spring Boot Admin 监控 |
 | 13-seata-intro | 分布式事务与 Seata 简介 |
 | 14-seata-deploy | Seata Server 部署（docker-compose / K8S） |
+| 15-seata-at | Seata AT 模式分布式事务 |
 
 
 ## 环境要求
@@ -536,4 +537,44 @@ docker compose -f docker-compose-cluster.yml up -d
 
 # Kubernetes（需先修改 k8s/seata-ha-server.yaml 中 Nacos 地址）
 kubectl apply -f ../k8s/seata-ha-server.yaml
+```
+
+## 15 - Seata AT 模式分布式事务
+
+代码位于 `15-seata-at` 目录，包含 `seata-at-common`、`seata-at-order-service`、`seata-at-ware-service`。
+
+演示 `@GlobalTransactional` 协调跨库下单：订单库 `seata-order` + 库存库 `seata-ware`，异常时库存扣减与订单创建一并回滚。
+
+### 前置条件
+
+1. 完成第 14 章 Seata Server 部署（8091）
+2. Nacos 已配置 `SEATA_GROUP` / `seataServer.properties`
+3. MySQL 创建库并导入脚本：
+
+```bash
+mysql -u root -p -e "CREATE DATABASE \`seata-order\` DEFAULT CHARACTER SET utf8mb4; CREATE DATABASE \`seata-ware\` DEFAULT CHARACTER SET utf8mb4;"
+mysql -u root -p seata-order < 15-seata-at/config/seata-order.sql
+mysql -u root -p seata-ware < 15-seata-at/config/seata-ware.sql
+```
+
+### 构建
+
+```bash
+mvn clean package -pl 15-seata-at/seata-at-order-service,15-seata-at/seata-at-ware-service -am -DskipTests
+```
+
+### 启动与验证
+
+```bash
+# 1. 启动库存服务（8008）
+java -jar 15-seata-at/seata-at-ware-service/target/seata-at-ware-service-1.0.0.jar
+
+# 2. 启动订单服务（8007）
+java -jar 15-seata-at/seata-at-order-service/target/seata-at-order-service-1.0.0.jar
+
+# 3. 触发全局事务（故意 NPE，库存与订单均应回滚）
+curl "http://localhost:8007/order/create?skuId=10086"
+
+# 4. 验证库存仍为 1000，订单表无新增记录
+mysql -u root -p -e "SELECT stock FROM seata-ware.t_ware WHERE sku_id=10086; SELECT COUNT(*) FROM seata-order.t_order;"
 ```

@@ -27,6 +27,7 @@
         <module>12-spring-boot-admin</module>
         <module>13-seata-intro</module>
         <module>14-seata-deploy</module>
+        <module>15-seata-at</module>
     </modules>
 
     <properties>

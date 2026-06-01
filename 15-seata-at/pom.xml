@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.iweidujiang</groupId>
+        <artifactId>spring-cloud-alibaba-lab</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>15-seata-at</artifactId>
+    <packaging>pom</packaging>
+    <name>15 - Seata AT Mode</name>
+    <description>Seata AT 模式分布式事务示例</description>
+
+    <properties>
+        <mybatis-plus.version>3.5.1</mybatis-plus.version>
+    </properties>
+
+    <modules>
+        <module>seata-at-common</module>
+        <module>seata-at-ware-service</module>
+        <module>seata-at-order-service</module>
+    </modules>
+</project>
